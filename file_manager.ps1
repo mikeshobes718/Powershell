@@ -1,14 +1,14 @@
 ﻿clear
+Clear-Content C:\Users\u584422\Desktop\Script\Powershell\found.txt
 #The pid of our script
 $pid_holder = $PID
 
-#PowerShell -File C:\Users\u584422\Desktop\Script\Powershell\hang_file.ps1
-
 #Get all PID's of "file name" and grep it like linux
-$data = Get-WmiObject Win32_Process -Filter "Name='powershell.exe' AND CommandLine LIKE '%file_manager.ps1%'" | Select-String -Pattern "Handle" -CaseSensitive
+$data = Get-WmiObject Win32_Process -Filter "Name='powershell.exe' AND CommandLine LIKE '%fileManager.ps1%'" | Select-String -Pattern "Handle" -CaseSensitive
+
 
 #Get count of times script is running
-$count = (Get-WmiObject Win32_Process -Filter "Name='powershell.exe' AND CommandLine LIKE '%file_manager.ps1%'").count
+$count = (Get-WmiObject Win32_Process -Filter "Name='powershell.exe' AND CommandLine LIKE '%fileManager.ps1%'").count
 
 #Store all grep'd lines into array
 $testArray = @()
@@ -41,25 +41,42 @@ if($count -gt 1){
 ###################FINDING FILE###################
 #echo "Running $pid_holder..."
 
-$timeout = new-timespan -Minutes 10
+$dirType = 1, 2, 3, 4
+$drives  = @()
+
+echo "Searching..."
+echo ""
+
+foreach($drive in $dirType) {
+    $value = GET-WMIOBJECT win32_logicaldisk -Filter "DriveType=$drive" | ForEach-Object -Process {$_.DeviceID}
+    $drives += $value
+}
+
+$timeout = new-timespan -Minutes 90 #Instructions were ten minutes
 $sw = [diagnostics.stopwatch]::StartNew()
 while ($sw.elapsed -lt $timeout){
-    if (test-path C:\Users\u584422\Desktop\Script\Powershell\){
+    if (test-path C:){
 
-        clear
-        echo "Please do not quit program till completion!"
-        echo "Now finding files..."
+        function Display_File_Details($Fullname,$size,$mode,$psdate,$owner) { 
+            if($mode -NotMatch "d"){
 
-        #Get hostname
-        $hostname = hostname
-        $hostname_saved = "    Hostname: $hostname"
-        $hostname_saved | Out-File C:\Users\u584422\Desktop\Script\Powershell\found.txt
-        #Get timestamp
-        $date = Get-Date -Format g
-        $date_saved = "    Timestamp: $date"
-        $date_saved | Out-File C:\Users\u584422\Desktop\Script\Powershell\found.txt -append -noClobber
-        #Find files and permissions
-        $path = Get-ChildItem -Recurse C:\ -ErrorAction SilentlyContinue | ?{ $_.PSIsContainer } | Out-File C:\Users\u584422\Desktop\Script\Powershell\found.txt -append -noClobber
+            $epoch = [timezone]::CurrentTimeZone.ToLocalTime([datetime]'1/1/1970') 
+            $epoch_dt =  (New-TimeSpan -Start $epoch -End $psdate).TotalSeconds 
+
+            $file_data = " $fullname | $size | $mode| $epoch_dt | $owner"
+            $file_data | Out-File C:\Users\u584422\Desktop\Script\Powershell\found.txt -append -noClobber
+            }
+        } 
+        foreach($driveArray in $drives){
+        $driven = echo $driveArray
+        echo "Currently Searching the $driven Drive"
+        Get-ChildItem $driven\ -File -Force -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Display_File_Details $_.FullName $_.Length $_.Mode $_.LastWriteTime } #****Works without the Get-ACL command****
+        #Get-ChildItem $driven\ -File -Force -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Display_File_Details $_.FullName $_.Length $_.Mode $_.LastWriteTime ((Get-ACL $_.FullName).Owner) }
+        }
+
+        echo ""
+        echo ""
+        echo "Finished!"
         Start-Sleep -m 1000000000
         return
         }
@@ -67,7 +84,5 @@ while ($sw.elapsed -lt $timeout){
 }
 
 write-host "Timed out"
-
-echo "Finished!"
 
 ###################End of Script###################
