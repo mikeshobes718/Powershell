@@ -1,4 +1,4 @@
- clear
+clear
 Clear-Content C:\Users\u584422\Desktop\Script\Powershell\found.txt
 
 #The pid of our script
