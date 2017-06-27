@@ -1,14 +1,15 @@
-﻿clear
+ clear
 Clear-Content C:\Users\u584422\Desktop\Script\Powershell\found.txt
+
 #The pid of our script
 $pid_holder = $PID
 
 #Get all PID's of "file name" and grep it like linux
-$data = Get-WmiObject Win32_Process -Filter "Name='powershell.exe' AND CommandLine LIKE '%fileManager.ps1%'" | Select-String -Pattern "Handle" -CaseSensitive
+$data = Get-WmiObject Win32_Process -Filter "Name='powershell.exe' AND CommandLine LIKE '%file_manager.ps1%'" | Select-String -Pattern "Handle" -CaseSensitive
 
-
+　
 #Get count of times script is running
-$count = (Get-WmiObject Win32_Process -Filter "Name='powershell.exe' AND CommandLine LIKE '%fileManager.ps1%'").count
+$count = (Get-WmiObject Win32_Process -Filter "Name='powershell.exe' AND CommandLine LIKE '%file_manager.ps1%'").count
 
 #Store all grep'd lines into array
 $testArray = @()
@@ -85,4 +86,4 @@ while ($sw.elapsed -lt $timeout){
 
 write-host "Timed out"
 
-###################End of Script###################
+###################End of Script################### 
