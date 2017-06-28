@@ -129,17 +129,21 @@ $milliseconds = $time | ForEach-Object -Process {$_.TotalMilliseconds}
 #$milliseconds
 
 if($hours -gt 0){
-echo ""
-echo "Your Program ran for $hours hours"
+clear
+echo "Your program ran for $hours hours"
+echo "`nWindow will close in 60 seconds or press CTRL+C to quit"
 }elseif($minutes -gt 0){
-echo ""
-echo "Your Program ran for $minutes minutes"
+clear
+echo "Your program ran for $minutes minutes"
+echo "`nWindow will close in 60 seconds or press CTRL+C to quit"
 }elseif($seconds -gt 0){
-echo ""
-echo "Your Program ran for $seconds seconds"
+clear
+echo "Your program ran for $seconds seconds"
+echo "`nWindow will close in 60 seconds or press CTRL+C to quit"
 }else{
-echo ""
-echo "Your Program ran for $milliseconds milliseconds"
+clear
+echo "Your program ran for $milliseconds milliseconds"
+echo "`nWindow will close in 60 seconds or press CTRL+C to quit"
 }
 
 Start-Sleep -s 60
